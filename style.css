@@ -1,0 +1,589 @@
+:root {
+  --primary: #e91e63;
+  --primary-light: #f8bbd0;
+  --primary-dark: #c2185b;
+  --secondary: #7b1fa2;
+  --text: #333;
+  --text-light: #666;
+  --white: #ffffff;
+  --light-bg: #fff9fa;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Background Animation */
+.background-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%);
+  z-index: -1;
+}
+
+.background-animation::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background-image: 
+    radial-gradient(circle, var(--primary-light) 1px, transparent 1px),
+    radial-gradient(circle, var(--primary-light) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.1;
+  animation: moveBackground 100s linear infinite;
+}
+
+@keyframes moveBackground {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Container */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  position: relative;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+h1 {
+  color: var(--primary-dark);
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+h1 i {
+  margin-right: 10px;
+  color: var(--primary);
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+/* Card */
+.card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.section-label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: var(--primary-dark);
+  font-size: 1.1rem;
+}
+
+.section-label i {
+  margin-right: 8px;
+  color: var(--primary);
+}
+
+/* Floating Labels */
+.floating {
+  position: relative;
+}
+
+.floating label {
+  position: absolute;
+  top: 1rem;
+  left: 3rem;
+  color: var(--text-light);
+  pointer-events: none;
+  transition: var(--transition);
+  z-index: 1;
+}
+
+.floating i {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  color: var(--primary);
+  transition: var(--transition);
+  z-index: 2;
+}
+
+.floating input,
+.floating textarea {
+  width: 100%;
+  padding: 1.5rem 1rem 1rem 3rem;
+  border: 2px solid #f0f0f0;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  transition: var(--transition);
+  background-color: #f9f9f9;
+  position: relative;
+  z-index: 0;
+}
+
+.floating textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.floating input:focus,
+.floating textarea:focus {
+  border-color: var(--primary-light);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+  background-color: var(--white);
+}
+
+.floating input:focus ~ label,
+.floating textarea:focus ~ label,
+.floating input:not(:placeholder-shown) ~ label,
+.floating textarea:not(:placeholder-shown) ~ label {
+  top: 0.5rem;
+  left: 3rem;
+  font-size: 0.8rem;
+  color: var(--primary);
+}
+
+.floating input:focus ~ i,
+.floating textarea:focus ~ i {
+  color: var(--primary-dark);
+}
+
+/* Rakhi Options */
+#rakhiOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.rakhi-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.rakhi-option span {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  transition: var(--transition);
+}
+
+.rakhiChoice {
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f9f9f9;
+  transition: var(--transition);
+}
+
+.rakhiChoice.selected {
+  border: 3px solid var(--primary);
+  background: var(--white);
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.1);
+  transform: translateY(-5px);
+}
+
+.rakhi-option:hover .rakhiChoice {
+  border-color: var(--primary-light);
+}
+
+.rakhi-option:hover span {
+  color: var(--primary-dark);
+}
+
+/* Preview Box */
+#rakhiPreviewBox {
+  margin: 2rem 0;
+  display: none;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.preview-header i {
+  color: var(--primary);
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.preview-header h3 {
+  color: var(--primary-dark);
+  font-size: 1.2rem;
+}
+
+.preview-image-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 2px dashed var(--primary-light);
+}
+
+#rakhiPreview {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* Buttons */
+button {
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background: var(--white);
+  color: var(--primary-dark);
+  border: 2px solid var(--primary-light);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+/* Result Container */
+#resultContainer {
+  display: none;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.success-card {
+  text-align: center;
+  padding: 2rem;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.success-icon i {
+  color: #4caf50;
+  font-size: 2rem;
+}
+
+.success-card h3 {
+  color: var(--primary-dark);
+  margin-bottom: 1.5rem;
+}
+
+#generatedLink {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  word-break: break-all;
+  border: 1px solid #eee;
+  text-align: left;
+  margin: 1rem 0;
+}
+
+#generatedLink a {
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#generatedLink a:hover {
+  text-decoration: underline;
+}
+
+.share-note {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-top: 1.5rem;
+  font-style: italic;
+}
+
+/* Error Messages */
+.error-message {
+  color: #e53935;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: none;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1rem;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+footer i {
+  color: var(--primary);
+}
+
+/* Camera Styles */
+#instructions {
+  text-align: center;
+  padding: 2rem;
+}
+
+#instructions h2 {
+  margin-bottom: 1rem;
+  color: var(--primary-dark);
+}
+
+#instructions ol {
+  text-align: left;
+  max-width: 400px;
+  margin: 1rem auto 2rem;
+  padding-left: 1.5rem;
+}
+
+#instructions li {
+  margin-bottom: 0.5rem;
+}
+
+#cameraContainer {
+  text-align: center;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.input_video,
+.output_canvas {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid var(--primary);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.output_canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#messageBox {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+}
+
+#messageBox p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.1rem;
+}
+
+#messageBox i {
+  color: var(--primary);
+}
+
+.sender-info {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+}
+
+.sender-info h2 {
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+}
+
+.sender-info p {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+#finalImage {
+  width: 100%;
+  max-width: 640px;
+  border-radius: 12px;
+  border: 2px solid var(--primary);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+  background: white;
+  padding: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from { 
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+  
+  #rakhiOptions {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .floating input,
+  .floating textarea {
+    padding-left: 2.5rem;
+  }
+  
+  .floating label {
+    left: 2.5rem;
+  }
+  
+  .floating i {
+    left: 0.8rem;
+  }
+  
+  #rakhiOptions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

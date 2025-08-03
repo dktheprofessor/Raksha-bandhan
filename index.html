@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Your Virtual Rakhi</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-hands-helping"></i> Create Your Virtual Rakhi</h1>
+      <p class="subtitle">Send love across miles this Raksha Bandhan</p>
+    </header>
+
+    <div class="card">
+      <form id="rakhiForm">
+        <div class="form-group floating">
+          <input type="text" id="name" required placeholder=" ">
+          <label for="name">Your Name</label>
+          <i class="fas fa-user"></i>
+          <div class="error-message" id="nameError"></div>
+        </div>
+
+        <div class="form-group floating">
+          <textarea id="message" required placeholder=" "></textarea>
+          <label for="message">Your Message</label>
+          <i class="fas fa-comment-dots"></i>
+          <div class="error-message" id="messageError"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="section-label"><i class="fas fa-gift"></i> Choose a Rakhi Design</label>
+          <div id="rakhiOptions">
+            <div class="rakhi-option">
+              <img src="rakhi1.png" class="rakhiChoice" data-value="rakhi1.png" alt="Floral Rakhi">
+              <span>Floral</span>
+            </div>
+            <div class="rakhi-option">
+              <img src="rakhi2.png" class="rakhiChoice" data-value="rakhi2.png" alt="Traditional Rakhi">
+              <span>Traditional</span>
+            </div>
+            <div class="rakhi-option">
+              <img src="rakhi3.png" class="rakhiChoice" data-value="rakhi3.png" alt="Beaded Rakhi">
+              <span>Beaded</span>
+            </div>
+            <div class="rakhi-option">
+              <img src="rakhi4.png" class="rakhiChoice" data-value="rakhi4.png" alt="Designer Rakhi">
+              <span>Designer</span>
+            </div>
+            <div class="rakhi-option">
+              <img src="rakhi5.png" class="rakhiChoice" data-value="rakhi5.png" alt="Golden Rakhi">
+              <span>Golden</span>
+            </div>
+            <div class="rakhi-option">
+              <img src="rakhi6.png" class="rakhiChoice" data-value="rakhi6.png" alt="Silver Rakhi">
+              <span>Silver</span>
+            </div>
+            <div class="rakhi-option">
+              <img src="rakhi7.png" class="rakhiChoice" data-value="rakhi7.png" alt="Kids Rakhi">
+              <span>Kids</span>
+            </div>
+            <div class="rakhi-option">
+              <img src="rakhi8.png" class="rakhiChoice" data-value="rakhi8.png" alt="Modern Rakhi">
+              <span>Modern</span>
+            </div>
+          </div>
+          <div class="error-message" id="rakhiError"></div>
+        </div>
+
+        <input type="hidden" id="rakhi" required>
+
+        <div id="rakhiPreviewBox">
+          <div class="preview-header">
+            <i class="fas fa-eye"></i>
+            <h3>Your Selected Rakhi</h3>
+          </div>
+          <div class="preview-image-container">
+            <img id="rakhiPreview" src="" alt="Selected Rakhi Preview">
+          </div>
+        </div>
+
+        <button type="submit" id="generateBtn" class="btn-primary">
+          <span class="btn-content">
+            <i class="fas fa-link"></i>
+            <span>Generate Rakhi Link</span>
+          </span>
+        </button>
+      </form>
+
+      <div id="resultContainer">
+        <div class="success-card">
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h3>Your Rakhi Link is Ready!</h3>
+          <div id="generatedLink"></div>
+          <button id="copyLinkBtn" class="btn-secondary">
+            <i class="fas fa-copy"></i> Copy Link
+          </button>
+          <p class="share-note">
+            Share this special Rakhi with your brother/sister
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Made with <i class="fas fa-heart"></i> for Raksha Bandhan</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const rakhiForm = document.getElementById('rakhiForm');
+      const rakhiChoices = document.querySelectorAll('.rakhiChoice');
+      const rakhiInput = document.getElementById('rakhi');
+      const nameInput = document.getElementById('name');
+      const messageInput = document.getElementById('message');
+      const previewBox = document.getElementById('rakhiPreviewBox');
+      const previewImg = document.getElementById('rakhiPreview');
+      const resultContainer = document.getElementById('resultContainer');
+      const generatedLink = document.getElementById('generatedLink');
+      const copyLinkBtn = document.getElementById('copyLinkBtn');
+      
+      // Error elements
+      const nameError = document.getElementById('nameError');
+      const messageError = document.getElementById('messageError');
+      const rakhiError = document.getElementById('rakhiError');
+
+      // Initially hide preview and result containers
+      previewBox.style.display = 'none';
+      resultContainer.style.display = 'none';
+
+      // Rakhi selection
+      rakhiChoices.forEach(img => {
+        img.addEventListener('click', function() {
+          rakhiChoices.forEach(choice => choice.classList.remove('selected'));
+          this.classList.add('selected');
+          rakhiInput.value = this.dataset.value;
+          previewImg.src = this.dataset.value;
+          previewBox.style.display = 'block';
+          rakhiError.style.display = 'none';
+        });
+      });
+
+      // Form submission
+      rakhiForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate form
+        let isValid = true;
+        
+        // Validate name
+        if (!nameInput.value.trim()) {
+          nameError.textContent = 'Please enter your name';
+          nameError.style.display = 'block';
+          isValid = false;
+        } else {
+          nameError.style.display = 'none';
+        }
+        
+        // Validate message
+        if (!messageInput.value.trim()) {
+          messageError.textContent = 'Please enter a message';
+          messageError.style.display = 'block';
+          isValid = false;
+        } else {
+          messageError.style.display = 'none';
+        }
+        
+        // Validate rakhi selection
+        if (!rakhiInput.value) {
+          rakhiError.textContent = 'Please select a Rakhi design';
+          rakhiError.style.display = 'block';
+          isValid = false;
+        } else {
+          rakhiError.style.display = 'none';
+        }
+        
+        if (!isValid) return;
+        
+        // Generate the link
+        const baseUrl = window.location.href.split('index.html')[0] + 'rakhi.html';
+        const url = new URL(baseUrl);
+        
+        url.searchParams.set('name', nameInput.value.trim());
+        url.searchParams.set('msg', messageInput.value.trim());
+        url.searchParams.set('rakhi', rakhiInput.value);
+        
+        // Display the generated link
+        generatedLink.innerHTML = `
+          <p>Share this special Rakhi with your brother/sister:</p>
+          <a href="${url.href}" target="_blank">${url.href}</a>
+        `;
+        resultContainer.style.display = 'block';
+        
+        // Scroll to the result
+        resultContainer.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // Copy link functionality
+      copyLinkBtn.addEventListener('click', function() {
+        const link = generatedLink.querySelector('a').href;
+        navigator.clipboard.writeText(link)
+          .then(() => {
+            copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+              copyLinkBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy link. Please try again.');
+          });
+      });
+    });
+  </script>
+</body>
+</html>

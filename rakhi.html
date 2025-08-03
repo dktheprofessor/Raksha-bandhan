@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Rakhi Experience</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-hands"></i> Virtual Rakhi Experience</h1>
+      <p class="subtitle">Show your hand to place the Rakhi</p>
+    </header>
+
+    <div class="card">
+      <div id="instructions">
+        <h2><i class="fas fa-info-circle"></i> How to use:</h2>
+        <ol>
+          <li>Allow camera access when prompted</li>
+          <li>Show your hand clearly</li>
+          <li>Hold still while we place the Rakhi</li>
+          <li>Download or share your Rakhi moment</li>
+        </ol>
+        <button id="startBtn" class="btn-primary">
+          <i class="fas fa-camera"></i> Start Camera
+        </button>
+        <div id="cameraError" class="error-message"></div>
+      </div>
+
+      <div id="cameraContainer" style="display:none;">
+        <div class="video-wrapper">
+          <video class="input_video" autoplay playsinline></video>
+          <canvas class="output_canvas"></canvas>
+        </div>
+        <div id="messageBox">
+          <p><i class="fas fa-hand-point-right"></i> Please show your hand to the camera</p>
+        </div>
+      </div>
+
+      <div id="resultContainer" style="display:none;">
+        <div class="sender-info">
+          <h2>From: <span id="senderName"></span></h2>
+          <p id="senderMessage"></p>
+        </div>
+        <img id="finalImage" alt="Your Virtual Rakhi">
+        <div class="action-buttons">
+          <button id="downloadBtn" class="btn-primary">
+            <i class="fas fa-download"></i> Download Image
+          </button>
+          <button id="shareBtn" class="btn-secondary">
+            <i class="fas fa-share-alt"></i> Share
+          </button>
+          <button id="newRakhiBtn" class="btn-secondary">
+            <i class="fas fa-plus"></i> Create Another
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="tune" src="tune.mp3" loop></audio>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const senderName = urlParams.get('name') || "Someone Special";
+      const message = urlParams.get('msg') || "Happy Raksha Bandhan!";
+      const rakhiImgPath = urlParams.get('rakhi') || 'rakhi1.png';
+      
+      // Set sender info
+      document.getElementById('senderName').textContent = senderName;
+      document.getElementById('senderMessage').textContent = message;
+      
+      // DOM Elements
+      const instructions = document.getElementById('instructions');
+      const startBtn = document.getElementById('startBtn');
+      const cameraContainer = document.getElementById('cameraContainer');
+      const videoElement = document.querySelector('.input_video');
+      const canvasElement = document.querySelector('.output_canvas');
+      const canvasCtx = canvasElement.getContext('2d');
+      const messageBox = document.getElementById('messageBox');
+      const resultContainer = document.getElementById('resultContainer');
+      const finalImage = document.getElementById('finalImage');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const shareBtn = document.getElementById('shareBtn');
+      const newRakhiBtn = document.getElementById('newRakhiBtn');
+      const cameraError = document.getElementById('cameraError');
+      const tune = document.getElementById('tune');
+      
+      // Set canvas size
+      canvasElement.width = 640;
+      canvasElement.height = 480;
+      
+      // Rakhi image
+      const rakhiImg = new Image();
+      rakhiImg.src = rakhiImgPath;
+      
+      // Play background music
+      document.body.addEventListener('click', () => {
+        tune.play().catch(e => console.log('Autoplay prevented'));
+      }, { once: true });
+      
+      // Hand Tracking Setup
+      const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+      });
+      
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7
+      });
+      
+      let camera = null;
+      let captured = false;
+      let finalImageURL = null;
+      
+      hands.onResults((results) => {
+        if (captured) return;
+        
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        // Draw camera feed
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+        
+        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+          const landmarks = results.multiHandLandmarks[0];
+          const wrist = landmarks[0];
+          const thumbBase = landmarks[1];
+          const indexBase = landmarks[5];
+          
+          // Calculate hand direction vector
+          const dx = thumbBase.x - indexBase.x;
+          const dy = thumbBase.y - indexBase.y;
+          
+          // Calculate wrist position
+          const x = wrist.x * canvasElement.width;
+          const y = wrist.y * canvasElement.height;
+          
+          // Calculate hand size for rakhi scaling
+          const handWidth = Math.sqrt(dx * dx + dy * dy);
+          const size = handWidth * canvasElement.width * 1.2; // Scale factor for rakhi size
+          
+          // Calculate rotation angle for rakhi
+          const angle = Math.atan2(dy, dx) * 90 / Math.PI;
+          
+          // Calculate rakhi position adjustment
+          const offsetX = Math.cos(angle * Math.PI/90) * size * 0.1;
+          const offsetY = Math.sin(angle * Math.PI/90) * size * 0.1;
+          
+          // Draw Rakhi with rotation and perfect alignment
+          canvasCtx.save();
+          canvasCtx.translate(x - offsetX, y - offsetY);
+          canvasCtx.rotate(angle * Math.PI/180);
+          canvasCtx.filter = 'contrast(1.2) saturate(1.3) drop-shadow(2px 2px 4px rgba(0,0,0,0.3))';
+          canvasCtx.drawImage(rakhiImg, -size/2, -size/2, size, size);
+          canvasCtx.filter = 'none';
+          canvasCtx.restore();
+          
+          // Update message
+          messageBox.innerHTML = '<p><i class="fas fa-check-circle"></i> Rakhi placed successfully!</p>';
+          
+          // Capture final image after short delay
+          if (!captured) {
+            setTimeout(() => {
+              finalImageURL = canvasElement.toDataURL('image/png');
+              finalImage.src = finalImageURL;
+              cameraContainer.style.display = 'none';
+              resultContainer.style.display = 'block';
+              captured = true;
+              stopCamera();
+            }, 1000);
+          }
+        } else {
+          messageBox.innerHTML = '<p><i class="fas fa-hand-point-right"></i> Please show your hand to the camera</p>';
+        }
+        
+        canvasCtx.restore();
+      });
+      
+      // Start camera
+      startBtn.addEventListener('click', async () => {
+        try {
+          startBtn.disabled = true;
+          startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+          
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: 'user',
+              width: { ideal: 640 },
+              height: { ideal: 480 }
+            },
+            audio: false
+          });
+          
+          videoElement.srcObject = stream;
+          instructions.style.display = 'none';
+          cameraContainer.style.display = 'block';
+          
+          camera = new Camera(videoElement, {
+            onFrame: async () => {
+              await hands.send({ image: videoElement });
+            },
+            width: 640,
+            height: 480
+          });
+          
+          camera.start();
+        } catch (err) {
+          console.error('Camera error:', err);
+          cameraError.innerHTML = '<p><i class="fas fa-exclamation-triangle"></i> Camera access denied. Please allow camera permissions.</p>';
+          cameraError.style.display = 'block';
+          startBtn.innerHTML = '<i class="fas fa-redo"></i> Try Again';
+          startBtn.disabled = false;
+        }
+      });
+      
+      // Stop camera
+      function stopCamera() {
+        if (camera) camera.stop();
+        if (videoElement.srcObject) {
+          videoElement.srcObject.getTracks().forEach(track => track.stop());
+        }
+      }
+      
+      // Setup action buttons
+      downloadBtn.onclick = () => {
+        if (!finalImageURL) return;
+        const link = document.createElement('a');
+        link.href = finalImageURL;
+        link.download = `rakhi-from-${senderName.replace(/\s+/g, '-')}.png`;
+        link.click();
+      };
+      
+      shareBtn.onclick = async () => {
+        if (navigator.share) {
+          try {
+            const response = await fetch(finalImageURL);
+            const blob = await response.blob();
+            const file = new File([blob], 'rakhi.png', { type: 'image/png' });
+            
+            await navigator.share({
+              title: 'Virtual Rakhi',
+              text: `${senderName} sent you a Rakhi!`,
+              files: [file]
+            });
+          } catch (err) {
+            console.error('Share failed:', err);
+          }
+        } else {
+          navigator.clipboard.writeText(window.location.href);
+          shareBtn.innerHTML = '<i class="fas fa-check"></i> Link Copied!';
+          setTimeout(() => {
+            shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> Share';
+          }, 2000);
+        }
+      };
+      
+      newRakhiBtn.onclick = () => {
+        window.location.href = 'index.html';
+      };
+      
+      // Clean up on page exit
+      window.addEventListener('beforeunload', () => {
+        stopCamera();
+      });
+    });
+  </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>
